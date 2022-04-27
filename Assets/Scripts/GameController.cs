@@ -20,10 +20,12 @@ public class GameController : MonoBehaviour
 
     Camera m_MainCamera;
     float m_FadeInOutMultiplier = 5f;
+    CursorLockMode m_InitialCursorLockMode;
 
     void Start()
     {
         m_MainCamera = Camera.main;
+        m_InitialCursorLockMode = Cursor.lockState;
 
         OnGameStartHandler();
     }
@@ -49,6 +51,7 @@ public class GameController : MonoBehaviour
 
     public void GameRestart()
     {
+        Cursor.lockState = m_InitialCursorLockMode;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
