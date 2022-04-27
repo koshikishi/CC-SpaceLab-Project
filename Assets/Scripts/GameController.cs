@@ -12,7 +12,6 @@ public class GameController : MonoBehaviour
     Camera m_MainCamera;
     float m_FadeInOutMultiplier = 5f;
 
-    // Start is called before the first frame update
     void Start()
     {
         m_MainCamera = Camera.main;
@@ -20,7 +19,6 @@ public class GameController : MonoBehaviour
         OnGameStartHandler();
     }
 
-    // Update is called once per frame
     void Update()
     {
         postProcessingLocalVolume.gameObject.transform.position = m_MainCamera.transform.position;
