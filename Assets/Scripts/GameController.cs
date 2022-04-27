@@ -3,11 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using StarterAssets;
 
 public class GameController : MonoBehaviour
 {
+    [Header("Post Processing")]
     public Volume postProcessingLocalVolume;
     public VolumeProfile postProcessingProfile;
+
+    [Space]
+    [Header("User Interface")]
+    public GameObject gameStartScreen;
+    public GameObject gameEndScreen;
+    public StarterAssetsInputs inputsScript;
 
     Camera m_MainCamera;
     float m_FadeInOutMultiplier = 5f;
@@ -38,6 +47,11 @@ public class GameController : MonoBehaviour
         StartCoroutine(nameof(FadeOut));
     }
 
+    public void GameRestart()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
     IEnumerator FadeIn()
     {
         while (postProcessingLocalVolume.weight > 0)
@@ -46,6 +60,8 @@ public class GameController : MonoBehaviour
 
             yield return new WaitForEndOfFrame();
         }
+
+        gameStartScreen.SetActive(false);
     }
 
     IEnumerator FadeOut()
@@ -57,6 +73,9 @@ public class GameController : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
 
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        GameObject.Find("/UIRoot(Clone)/Canvas/CenterPoint").GetComponent<Image>().enabled = false;
+        gameEndScreen.SetActive(true);
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
     }
 }
