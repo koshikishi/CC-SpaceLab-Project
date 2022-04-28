@@ -15,17 +15,20 @@ public class GameController : MonoBehaviour
     [Space]
     [Header("User Interface")]
     public GameObject gameStartScreen;
+    public GameObject gameMenuScreen;
     public GameObject gameEndScreen;
     public StarterAssetsInputs inputsScript;
+    public AudioSource audioSource;
+    public AudioClip menuOnAudioFX;
+    public AudioClip menuOffAudioFX;
 
     Camera m_MainCamera;
     float m_FadeInOutMultiplier = 5f;
-    CursorLockMode m_InitialCursorLockMode;
+    bool m_IsMenuOpened = false;
 
     void Start()
     {
         m_MainCamera = Camera.main;
-        m_InitialCursorLockMode = Cursor.lockState;
 
         OnGameStartHandler();
     }
@@ -51,8 +54,42 @@ public class GameController : MonoBehaviour
 
     public void GameRestart()
     {
-        Cursor.lockState = m_InitialCursorLockMode;
+        Cursor.lockState = CursorLockMode.Locked;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    public void MenuToggle()
+    {
+        if (m_IsMenuOpened)
+        {
+            LockCursor();
+            audioSource.PlayOneShot(menuOffAudioFX);
+            gameMenuScreen.SetActive(false);
+            m_IsMenuOpened = false;
+        }
+        else
+        {
+            UnlockCursor();
+            audioSource.PlayOneShot(menuOnAudioFX);
+            gameMenuScreen.SetActive(true);
+            m_IsMenuOpened = true;
+        }
+    }
+
+    void LockCursor()
+    {
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+        inputsScript.cursorInputForLook = true;
+        GameObject.Find("/UIRoot(Clone)/Canvas/CenterPoint").GetComponent<Image>().enabled = true;
+    }
+
+    void UnlockCursor()
+    {
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+        inputsScript.cursorInputForLook = false;
+        GameObject.Find("/UIRoot(Clone)/Canvas/CenterPoint").GetComponent<Image>().enabled = false;
     }
 
     IEnumerator FadeIn()
@@ -64,6 +101,9 @@ public class GameController : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
 
+        yield return new WaitForSeconds(2f);
+
+        GameObject.Find("/UIRoot(Clone)/Canvas/CenterPoint").GetComponent<Image>().enabled = true;
         gameStartScreen.SetActive(false);
     }
 
@@ -76,9 +116,7 @@ public class GameController : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
 
-        GameObject.Find("/UIRoot(Clone)/Canvas/CenterPoint").GetComponent<Image>().enabled = false;
+        UnlockCursor();
         gameEndScreen.SetActive(true);
-        Cursor.visible = true;
-        Cursor.lockState = CursorLockMode.None;
     }
 }
